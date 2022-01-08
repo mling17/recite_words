@@ -47,6 +47,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'apps.account.middleware.auth.AuthMiddleware',
 ]
 
 ROOT_URLCONF = 'recite_words.urls'
@@ -73,10 +74,22 @@ WSGI_APPLICATION = 'recite_words.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'jp_words',
+        'USER': 'root',
+        'PASSWORD': 'mling17!163.com',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 
@@ -120,3 +133,15 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ########### 登录白名单：无需登录就可以访问的页面 ###########
+WHITE_REGEX_URL_LIST = [
+    "/account/regist/",
+    "/account/login/",
+    "/account/image/code/",
+    "/account/index/",
+]
+# 登录承购后的跳转页面
+SIGNED_DIRECT = 'account:index'
+# session过期时间，默认14天
+SESSION_EXPIRE = 60 * 60 * 24 * 14
