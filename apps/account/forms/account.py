@@ -8,13 +8,17 @@ from django.conf import settings
 
 from django_redis import get_redis_connection
 
-from web import models
-from web.forms.bootstrap import BootStrapForm
-from utils.tencent.sms import send_sms_single
-from utils import encrypt
+from apps.account import models
+from apps.account.forms.forms import BootStrapForm
+# from utils.tencent.sms import send_sms_single
+from apps.account.utils import encrypt
 
 
 class RegisterModelForm(BootStrapForm, forms.ModelForm):
+    def __init__(self, request, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.request = request
+
     password = forms.CharField(
         label='密码',
         min_length=8,
@@ -43,12 +47,12 @@ class RegisterModelForm(BootStrapForm, forms.ModelForm):
         widget=forms.TextInput())
 
     class Meta:
-        model = models.UserInfo
+        model = models.User
         fields = ['username', 'email', 'password', 'confirm_password', 'mobile_phone', 'code']
 
     def clean_username(self):
         username = self.cleaned_data['username']
-        exists = models.UserInfo.objects.filter(username=username).exists()
+        exists = models.User.objects.filter(username=username).exists()
         if exists:
             raise ValidationError('用户名已存在')
             # self.add_error('username','用户名已存在')
@@ -56,7 +60,7 @@ class RegisterModelForm(BootStrapForm, forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data['email']
-        exists = models.UserInfo.objects.filter(email=email).exists()
+        exists = models.User.objects.filter(email=email).exists()
         if exists:
             raise ValidationError('邮箱已存在')
         return email
@@ -64,44 +68,34 @@ class RegisterModelForm(BootStrapForm, forms.ModelForm):
     def clean_password(self):
         pwd = self.cleaned_data['password']
         # 加密 & 返回
-        return encrypt.md5(pwd)
+        p = encrypt.md5(pwd)
+        print(p)
+        return p
 
     def clean_confirm_password(self):
         pwd = self.cleaned_data.get('password')
-
         confirm_pwd = encrypt.md5(self.cleaned_data['confirm_password'])
-
         if pwd != confirm_pwd:
             raise ValidationError('两次密码不一致')
-
         return confirm_pwd
 
     def clean_mobile_phone(self):
         mobile_phone = self.cleaned_data['mobile_phone']
-        exists = models.UserInfo.objects.filter(mobile_phone=mobile_phone).exists()
+        exists = models.User.objects.filter(mobile_phone=mobile_phone).exists()
         if exists:
             raise ValidationError('手机号已注册')
         return mobile_phone
 
     def clean_code(self):
+        """ 钩子 图片验证码是否正确？ """
+        # 读取用户输入的yanzhengm
         code = self.cleaned_data['code']
-
-        # mobile_phone = self.cleaned_data['mobile_phone']
-
-        mobile_phone = self.cleaned_data.get('mobile_phone')
-        if not mobile_phone:
-            return code
-
-        conn = get_redis_connection()
-        redis_code = conn.get(mobile_phone)
-        if not redis_code:
-            raise ValidationError('验证码失效或未发送，请重新发送')
-
-        redis_str_code = redis_code.decode('utf-8')
-
-        if code.strip() != redis_str_code:
-            raise ValidationError('验证码错误，请重新输入')
-
+        # 去session获取自己的验证码
+        session_code = self.request.session.get('image_code')
+        if not session_code:
+            raise ValidationError('验证码已过期，请重新获取')
+        if code.strip().upper() != session_code.strip().upper():
+            raise ValidationError('验证码输入错误')
         return code
 
 
@@ -123,7 +117,7 @@ class SendSmsForm(forms.Form):
             # self.add_error('mobile_phone','短信模板错误')
             raise ValidationError('短信模板错误')
 
-        exists = models.UserInfo.objects.filter(mobile_phone=mobile_phone).exists()
+        exists = models.User.objects.filter(mobile_phone=mobile_phone).exists()
         if tpl == 'login':
             if not exists:
                 raise ValidationError('手机号不存在')
@@ -158,7 +152,7 @@ class LoginSMSForm(BootStrapForm, forms.Form):
 
     def clean_mobile_phone(self):
         mobile_phone = self.cleaned_data['mobile_phone']
-        exists = models.UserInfo.objects.filter(mobile_phone=mobile_phone).exists()
+        exists = models.User.objects.filter(mobile_phone=mobile_phone).exists()
         # user_object = models.UserInfo.objects.filter(mobile_phone=mobile_phone).first()
         if not exists:
             raise ValidationError('手机号不存在')
@@ -204,13 +198,10 @@ class LoginForm(BootStrapForm, forms.Form):
         """ 钩子 图片验证码是否正确？ """
         # 读取用户输入的yanzhengm
         code = self.cleaned_data['code']
-
         # 去session获取自己的验证码
         session_code = self.request.session.get('image_code')
         if not session_code:
             raise ValidationError('验证码已过期，请重新获取')
-
         if code.strip().upper() != session_code.strip().upper():
             raise ValidationError('验证码输入错误')
-
         return code

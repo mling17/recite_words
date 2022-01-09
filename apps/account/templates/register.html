@@ -6,7 +6,7 @@
             <form class='form-register' action="{% url 'account:regist' %}" method="post">
                 {% csrf_token %}
                 <h2 class="text-center">新用户注册</h2>
-                {% for field in register_form %}
+                {% for field in form %}
                     <div class="form-group">
                         <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                         {{ field }}
@@ -14,6 +14,9 @@
                     </div>
                 {% endfor %}
                 <button type="reset" class="btn btn-default pull-left">重置</button>
+                <div class="col-xs-5">
+                    <img src="{% url 'account:image_code' %}" id="imageCode" title="点击更换图片">
+                </div>
                 <button type="submit" class="btn btn-primary pull-right">提交</button>
             </form>
         </div>

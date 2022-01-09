@@ -1,8 +1,10 @@
+from io import BytesIO
 from django.shortcuts import render, HttpResponse, redirect
-from django.urls import reverse
-from .forms.forms import RegisterForm, LoginForm
+from django.conf import settings
+from django.db.models import Q
+from apps.account.forms.account import RegisterModelForm, LoginForm
 from apps.account import models
-from utiles import tools
+from apps.account.utils.image_code import check_code
 
 
 # Create your views here.
@@ -12,54 +14,47 @@ def index(request):
 
 def register(request):
     """注册视图"""
-    if request.session.get('is_login', None):
-        # 登录状态不允许注册
-        return redirect("/index/")
-    if request.method == "POST":
-        register_form = RegisterForm(request.POST)
-        message = "请检查填写的内容！"
-        if register_form.is_valid():
-            username = register_form.cleaned_data['username']
-            password = register_form.cleaned_data['password']
-            email = register_form.cleaned_data['email']
-            new_user = models.User()
-            new_user.username = username
-            new_user.password = tools.hash_md5(password)  # 使用加密密码
-            new_user.email = email
-            new_user.save()
-            print(username)
-            return redirect(reverse('account:login'))  # 自动跳转到登录页面
-        else:
-            return render(request, 'register.html', locals())
-    register_form = RegisterForm()
-    return render(request, 'register.html', locals())
+    if request.method == 'GET':
+        form = RegisterModelForm(request)
+        return render(request, 'register.html', {'form': form})
+    form = RegisterModelForm(request, request.POST)
+    if form.is_valid():
+        form.save()
+        return redirect('account:index')
+        # return JsonResponse({"status": True, 'data': "/index/"})
+    return render(request, 'register.html', {'form': form})
 
 
 def login(request):
-    if request.method == 'POST':
-        login_form = LoginForm(request.POST)
-        if login_form.is_valid():
-            user = login_form.cleaned_data['user']
-            auth.login(request, user)
-            return redirect(request.GET.get('from', reverse('index')))
-        else:
-            return render(request, 'login.html', {'login_form': login_form})
-    login_form = LoginForm()
-    return render(request, 'login.html', {'login_form': login_form})
+    """ 用户名和密码登录 """
+    if request.method == 'GET':
+        form = LoginForm(request)
+        return render(request, 'login.html', {'form': form})
+    form = LoginForm(request, data=request.POST)
+    if form.is_valid():
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+        user_object = models.User.objects.filter(Q(username=username) | Q(mobile_phone=username) | Q(email=username)) \
+            .filter(password=password).first()
+        if user_object:
+            request.session['user_id'] = user_object.id
+            request.session.set_expiry(settings.SESSION_EXPIRE)
+            return redirect(settings.SIGNED_DIRECT)
+        form.add_error('username', '用户名或密码错误')
+
+    return render(request, 'login.html', {'form': form})
 
 
-def login(request):
-    if request.method == 'POST':
-        login_form = LoginForm(request.POST)
-        if login_form.is_valid():
-            user = login_form.cleaned_data['user']
-            auth.login(request, user)
-            return redirect(request.GET.get('from', reverse('index')))
-        else:
-            print(3333333333)
-            return render(request, 'login.html', {"login_form": login_form})
-    else:
-        login_form = LoginForm()
-    context = dict()
-    context['login_form'] = login_form
-    return render(request, 'login.html', context)
+def image_code(request):
+    """ 生成图片验证码 """
+    image_object, code = check_code()
+    request.session['image_code'] = code
+    request.session.set_expiry(60)  # 主动修改session的过期时间为60s
+    stream = BytesIO()
+    image_object.save(stream, 'png')
+    return HttpResponse(stream.getvalue())
+
+
+def logout(request):
+    request.session.flush()
+    return redirect(settings.SIGNED_DIRECT)
