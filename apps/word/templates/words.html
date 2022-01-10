@@ -1,51 +1,148 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
-          integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+{% extends 'layout/basic.html' %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugin/editor-md/css/editormd.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/bootstrap-datepicker/css/bootstrap-datepicker.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/bootstrap-select/css/bootstrap-select.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/select2/css/select2.min.css' %}">
+    <style>
+        .word-list .number {
+            width: 100px;
+            text-align: right;
+        }
 
-    <!-- 可选的 Bootstrap 主题文件（一般不用引入） -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css"
-          integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+        .word-list .number a {
+            font-weight: 500;
+            padding: 0 10px;
+        }
 
-    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
-            integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
-            crossorigin="anonymous"></script>
-    <title>Title</title>
-</head>
-<body>
-<div class="bs-example" data-example-id="hoverable-table">
-    <table class="table table-hover">
-        <thead>
-        <tr>
-            <th>Book Name</th>
-            <th>Unit</th>
-            <th>word</th>
-            <th>symbol</th>
-            <th>voice</th>
-            <th>cn</th>
-            <th>word_type</th>
-            <th>sentence</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for word in words %}
-            <tr>
-                <td>{{ word.book_name }}</td>
-                <td>{{ word.unit }}</td>
-                <td>{{ word.classes }}</td>
-                <td>{{ word.symbol }}</td>
-                <td>{{ word.voice }}</td>
-                <td>{{ word.cn }}</td>
-                <td>{{ word.word_type }}</td>
-                <td>{{ word.sentence }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
-</body>
-</html>
+        .word-list .word .tags {
+            padding: 10px 0;
+        }
+
+        .word-list .word .tags span {
+            margin-right: 20px;
+            display: inline-block;
+            font-size: 12px;
+        }
+
+        .word-list .word .tags .type {
+            color: white;
+            padding: 1px 5px;
+            border-radius: 5px;
+            background-color: #dddddd;
+        }
+
+        .editormd {
+            margin-bottom: 0;
+        }
+
+        .pd-0 {
+            padding: 0 !important;
+        }
+
+        /* 筛选 */
+        .filter-area .item {
+            margin-bottom: 15px;
+        }
+
+        .filter-area .item .title {
+            padding: 5px 0;
+        }
+
+        .filter-area .item .check-list a {
+            text-decoration: none;
+            display: inline-block;
+            min-width: 65px;
+        }
+
+        .filter-area .item .check-list label {
+            font-weight: 200;
+            font-size: 13px;
+            margin-left: 3px;
+        }
+
+        .filter-area .item .check-list a:hover {
+            font-weight: 300;
+        }
+
+        .filter-area .item .check-list .cell {
+            margin-right: 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid clearfix" style="padding: 20px 0;">
+        <div class="col-sm-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <i class="fa fa-search" aria-hidden="true"></i> 筛选
+                </div>
+                <div class="panel-body filter-area">
+                    {% for row in filter_list %}
+                        <div class="item">
+                            <div class="title">{{ row.title }}</div>
+                            <div class="check-list">
+                                {% for item in row.filter %}
+                                    {{ item }}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <div class="panel panel-default">
+                {#                <div class="panel-heading">#}
+                {#                    <i class="fa fa-quora" aria-hidden="true"></i> 问题#}
+                {#                </div>#}
+                {#                <div class="panel-body">#}
+                {#                    <a class="btn btn-success btn-sm" data-toggle="modal" data-target="#addModal">新建问题</a>#}
+                {#                    <a class="btn btn-primary btn-sm" data-toggle="modal" data-target="#inviteModal">邀请成员</a>#}
+                {#                </div>#}
+                <div class="bs-example" data-example-id="hoverable-table">
+                    <table class="table">
+                        <tbody class="word-list">
+                        <thead>
+                        <tr>
+                            <th>book_name</th>
+                            <th>Unit</th>
+                            <th>class</th>
+                            <th>word</th>
+                            <th>symbol</th>
+                            <th>voice</th>
+                            <th>cn</th>
+                            <th>word_type</th>
+                            <th>sentence</th>
+                        </tr>
+                        </thead>
+                        {% for word in word_object_list %}
+                            <tr>
+                                <td>{{ word.book_name }}</td>
+                                <td>{{ word.unit }}</td>
+                                <td>{{ word.classes }}</td>
+                                <td>{{ word.word }}</td>
+                                <td>{{ word.symbol }}</td>
+                                <td>{{ word.voice }}</td>
+                                <td>{{ word.cn }}</td>
+                                <td>{{ word.word_type }}</td>
+                                <td>{{ word.sentence }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+
+            <nav aria-label="...">
+                <ul class="pagination" style="margin-top: 0;">
+                    {{ page_html|safe }}
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+{% endblock %}
