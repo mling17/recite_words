@@ -96,9 +96,9 @@
         </div>
         <div class="col-sm-9">
             <div class="panel panel-default">
-{#                <div class="panel-heading">#}
-{#                    <i class="fa fa-quora" aria-hidden="true"></i> 问题#}
-{#                </div>#}
+                {#                <div class="panel-heading">#}
+                {#                    <i class="fa fa-quora" aria-hidden="true"></i> 问题#}
+                {#                </div>#}
                 {#                                <div class="panel-body">#}
                 {#                                    <a class="btn btn-success btn-sm" data-toggle="modal" data-target="#addModal">新建问题</a>#}
                 {#                                    <a class="btn btn-primary btn-sm" data-toggle="modal" data-target="#inviteModal">邀请成员</a>#}
@@ -109,16 +109,15 @@
                     </div>
                     <div class="panel-body">
                         <div class="search-group">
-                            {% for row in search_group_row_list %}
-                                <div class="row">
-                                    {% for obj in row %}
-                                        {{ obj|safe }}
-                                    {% endfor %}
-                                </div>
-                            {% endfor %}
+                            <label>
+                                <select class="form-control">
+
+                                </select>
+                            </label>
                         </div>
                     </div>
                 </div>
+
                 <div class="bs-example" data-example-id="hoverable-table">
                     <table class="table">
                         <tbody class="word-list">
@@ -160,5 +159,4 @@
         </div>
 
     </div>
-
 {% endblock %}

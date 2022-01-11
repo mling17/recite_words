@@ -18,6 +18,6 @@ WHITE_REGEX_URL_LIST = [
     "/account/index/",
 ]
 # 登录承购后的跳转页面,namespace:name
-SIGNED_DIRECT = 'manage:index'
+SIGNED_DIRECT = 'word:word_list'
 # session过期时间，默认14天
 SESSION_EXPIRE = 60 * 60 * 24 * 14
