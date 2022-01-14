@@ -31,13 +31,13 @@ def word_list(request):
         book = request.GET.get('book_name', -1)
         unit = request.GET.get('unit', -1)
         lesson = request.GET.get('lesson', -1)
-        if book == '-1' or book is None:
+        if str(book) == '-1' or book is None:
             queryset = models.Words.objects.all()
         else:
-            if unit == '-1':
+            if str(unit) == '-1':
                 queryset = models.Words.objects.filter(book_name=book)
             else:
-                if lesson == '-1':
+                if str(lesson) == '-1':
                     queryset = models.Words.objects.filter(book_name=book, unit=int(unit))
                 else:
                     queryset = models.Words.objects.filter(book_name=book, unit=int(unit), classes=int(lesson))
@@ -72,4 +72,4 @@ class WordHandler(StarkHandler):
 
 
 def word_test(request):
-    return render(request, 'word_test.html')
+    return render(request, 'learn_records.html')

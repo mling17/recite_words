@@ -74,10 +74,10 @@
 
 {% block content %}
     <div class="container-fluid clearfix" style="padding: 20px 0;">
-        <div class="col-sm-2">
+        <div class="col-sm-3">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <i class="fa fa-search" aria-hidden="true"></i> 筛选
+                    <i class="fa fa-search" aria-hidden="true"></i> Menu
                 </div>
                 <div class="panel-body filter-area">
                     {% for row in filter_list %}
@@ -96,13 +96,6 @@
         </div>
         <div class="col-sm-9">
             <div class="panel panel-default">
-                {#                <div class="panel-heading">#}
-                {#                    <i class="fa fa-quora" aria-hidden="true"></i> 问题#}
-                {#                </div>#}
-                {#                                <div class="panel-body">#}
-                {#                                    <a class="btn btn-success btn-sm" data-toggle="modal" data-target="#addModal">新建问题</a>#}
-                {#                                    <a class="btn btn-primary btn-sm" data-toggle="modal" data-target="#inviteModal">邀请成员</a>#}
-                {#                                </div>#}
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <i class="fa fa-filter" aria-hidden="true"></i> 快速筛选
@@ -192,69 +185,63 @@
                 break;
             }
         }
-        {#if (selectedValue.unit != '-1') {#}
-        {#    $('#unitSelect').show()#}
-        {#}#}
-            {#if (selectedValue.lesson != '-1') {#}
-            {#    $('#lessonSelect').show()#}
-            {#}#}
-                for (var i = 0; i < obj2.options.length; i++) {
-                    if (obj2.options[i].value == selectedValue.unit) {
-                        obj2.options[i].selected = 'selected';
-                        changeLesson();
-                        break;
-                    }
-                }
-                for (var i = 0; i < obj3.options.length; i++) {
-                    if (obj3.options[i].value == selectedValue.lesson) {
-                        obj3.options[i].selected = 'selected';
-                        break;
-                    }
-                }
+        for (var i = 0; i < obj2.options.length; i++) {
+            if (obj2.options[i].value == selectedValue.unit) {
+                obj2.options[i].selected = 'selected';
+                changeLesson();
+                break;
+            }
+        }
+        for (var i = 0; i < obj3.options.length; i++) {
+            if (obj3.options[i].value == selectedValue.lesson) {
+                obj3.options[i].selected = 'selected';
+                break;
+            }
+        }
 
 
-                function changeUnit() {
-                    var myselect = document.getElementById("bookSelect");
-                    var selectedIndex = myselect.options.selectedIndex; // selectedIndex代表的是你所选中项的index
-                    var bookValue = myselect.options[selectedIndex].value;
-                    if (bookValue != -1) {
-                        var units = dic[bookValue]['unit'];
-                    }
-                    if (bookValue == -1) {
-                        $('#unitSelect').hide();
-                    } else {
-                        $('#unitSelect').show()
-                    }
-                    $('#lessonSelect').hide();
-                    obj2.options.length = 0;
-                    obj3.options.length = 0;
-                    obj2.options.add(new Option('请选择单元', -1));
-                    obj3.options.add(new Option('请选择课次', -1));
-                    for (var key in units) {
-                        obj2.options.add(new Option(`第${key}单元`, key))
-                    }
-                }
+        function changeUnit() {
+            var myselect = document.getElementById("bookSelect");
+            var selectedIndex = myselect.options.selectedIndex; // selectedIndex代表的是你所选中项的index
+            var bookValue = myselect.options[selectedIndex].value;
+            if (bookValue != -1) {
+                var units = dic[bookValue]['unit'];
+            }
+            if (bookValue == -1) {
+                $('#unitSelect').hide();
+            } else {
+                $('#unitSelect').show()
+            }
+            $('#lessonSelect').hide();
+            obj2.options.length = 0;
+            obj3.options.length = 0;
+            obj2.options.add(new Option('请选择单元', -1));
+            obj3.options.add(new Option('请选择课次', -1));
+            for (var key in units) {
+                obj2.options.add(new Option(`第${key}单元`, key))
+            }
+        }
 
-                function changeLesson() {
-                    var bookSelect = document.getElementById("bookSelect");
-                    var selectedIndex = bookSelect.options.selectedIndex; // selectedIndex代表的是你所选中项的index
-                    var bookValue = bookSelect.options[selectedIndex].value;
-                    var unitSelect = document.getElementById("unitSelect");
-                    var selectedIndex = unitSelect.options.selectedIndex; // selectedIndex代表的是你所选中项的index
-                    var unitValue = unitSelect.options[selectedIndex].value;
-                    var lessons = dic[bookValue]['unit'][unitValue];
-                    obj3.options.length = 0;
-                    obj3.options.add(new Option('请选择课次', -1));
-                    if (unitValue == -1) {
-                        $('#lessonSelect').hide();
-                    } else {
-                        $('#lessonSelect').show()
-                    }
-                    if (unitValue != -1) {
-                        for (j = 0, len = lessons.length; j < len; j++) {
-                            obj3.options.add(new Option(`第${lessons[j]}课`, lessons[j]))
-                        }
-                    }
+        function changeLesson() {
+            var bookSelect = document.getElementById("bookSelect");
+            var selectedIndex = bookSelect.options.selectedIndex; // selectedIndex代表的是你所选中项的index
+            var bookValue = bookSelect.options[selectedIndex].value;
+            var unitSelect = document.getElementById("unitSelect");
+            var selectedIndex = unitSelect.options.selectedIndex; // selectedIndex代表的是你所选中项的index
+            var unitValue = unitSelect.options[selectedIndex].value;
+            var lessons = dic[bookValue]['unit'][unitValue];
+            obj3.options.length = 0;
+            obj3.options.add(new Option('请选择课次', -1));
+            if (unitValue == -1) {
+                $('#lessonSelect').hide();
+            } else {
+                $('#lessonSelect').show()
+            }
+            if (unitValue != -1) {
+                for (j = 0, len = lessons.length; j < len; j++) {
+                    obj3.options.add(new Option(`第${lessons[j]}课`, lessons[j]))
                 }
+            }
+        }
     </script>
 {% endblock %}
