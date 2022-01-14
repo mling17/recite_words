@@ -20,4 +20,5 @@ import apps.word.views as views
 urlpatterns = [
     # path('index/', views.index, name='index'),
     path('list/', views.word_list, name='word_list'),
+    path('test/', views.word_test, name='word_test'),
 ]

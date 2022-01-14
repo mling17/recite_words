@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+</head>
+<body>
+<form action="/test" method="get">
+    <select id="myselect1" name="book_name" onchange=changeUnit()></select>
+    <select id="myselect2" name="unit" onchange=changeLesson() style="display: none"></select>
+    <select id="myselect3" name="lesson" style="display: none"></select>
+    <input type="submit" value="提交">
+</form>
+<script>
+    var dic = {
+        "标上": {
+            "name": "标上",
+            "unit": {
+                1: [1, 2, 3, 4],
+                2: [5, 6, 7, 8],
+                3: [9, 10, 11, 12],
+            }
+        },
+        '自定义': {
+            "name": "自定义",
+            "unit": {
+                1: [1, 2, 3, 4]
+            }
+        }
+    }
+    var obj1 = document.getElementById('myselect1');
+    var obj2 = document.getElementById('myselect2');
+    var obj3 = document.getElementById('myselect3');
+    obj1.options.add(new Option('请选择', -1));
+    for (var key in dic) {
+        obj1.options.add(new Option(dic[key].name, dic[key].name))
+    }
+
+    function changeUnit() {
+        var myselect = document.getElementById("myselect1");
+        var selectedIndex = myselect.options.selectedIndex; // selectedIndex代表的是你所选中项的index
+        var bookValue = myselect.options[selectedIndex].value;
+        if (bookValue != -1) {
+            var units = dic[bookValue]['unit'];
+        }
+        if (bookValue == -1) {
+            $('#myselect2').hide();
+        } else {
+            $('#myselect2').show()
+        }
+        $('#myselect3').hide();
+        obj2.options.length = 0;
+        obj3.options.length = 0;
+        obj2.options.add(new Option('请选择', -1));
+        obj3.options.add(new Option('请选择', -1));
+        for (var key in units) {
+            obj2.options.add(new Option(key, key))
+        }
+    }
+
+    function changeLesson() {
+        var myselect1 = document.getElementById("myselect1");
+        var selectedIndex = myselect1.options.selectedIndex; // selectedIndex代表的是你所选中项的index
+        var bookValue = myselect1.options[selectedIndex].value;
+        var myselect2 = document.getElementById("myselect2");
+        var selectedIndex = myselect2.options.selectedIndex; // selectedIndex代表的是你所选中项的index
+        var unitValue = myselect2.options[selectedIndex].value;
+        var lessons = dic[bookValue]['unit'][unitValue];
+        console.log(dic[bookValue]['unit'][unitValue])
+        obj3.options.length = 0;
+        obj3.options.add(new Option('请选择', -1));
+        if (unitValue == -1) {
+            $('#myselect3').hide();
+        } else {
+            $('#myselect3').show()
+        }
+        if (unitValue != -1) {
+            for (j = 0, len = lessons.length; j < len; j++) {
+                console.log(lessons[j])
+                obj3.options.add(new Option(lessons[j], lessons[j]))
+            }
+        }
+    }
+</script>
+</body>
+</html>

@@ -14,11 +14,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
+from apps.stark.service.v1 import site
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('account/', include(('apps.account.urls', 'account'), namespace='account')),
     path('manage/', include(('apps.management.urls', 'manage'), namespace='manage')),
     path('word/', include(('apps.word.urls', 'word'), namespace='word')),
+    re_path(r'^stark/', site.urls),
 ]

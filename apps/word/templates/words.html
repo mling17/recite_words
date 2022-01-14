@@ -85,7 +85,7 @@
                             <div class="title">{{ row.title }}</div>
                             <div class="check-list">
                                 {% for item in row.filter %}
-                                    {{ item }}
+                                    {{ item }}1
                                 {% endfor %}
                             </div>
                         </div>
@@ -109,11 +109,23 @@
                     </div>
                     <div class="panel-body">
                         <div class="search-group">
-                            <label>
-                                <select class="form-control">
+                            <form class="form-inline">
+                                <div class="form-group">
+                                    <label for="bookSelect"> </label>
+                                    <select class="form-control" id="bookSelect" name="book_name"
+                                            onchange=changeUnit()></select>
+                                    <label for="unitSelect"></label>
+                                    <select class="form-control" id="unitSelect" name="unit" onchange=changeLesson()
+                                            style="display: none">
+                                    </select>
 
-                                </select>
-                            </label>
+                                    <label for="lessonSelect"></label>
+                                    <select class="form-control" id="lessonSelect" name="lesson"
+                                            style="display: none">
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-default" style="margin-bottom: 5px">搜索</button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -159,4 +171,90 @@
         </div>
 
     </div>
+{% endblock %}
+{% block js %}
+    <script>
+        var dic = {{ word_group|safe }};
+        var selectedValue = {{ query_params |safe}};
+        $('#unitSelect').val(selectedValue.unit);
+        $('#lessonSelect').val(selectedValue.lesson);
+        var obj1 = document.getElementById('bookSelect');
+        var obj2 = document.getElementById('unitSelect');
+        var obj3 = document.getElementById('lessonSelect');
+        obj1.options.add(new Option('请选择课本', -1));
+        for (var key in dic) {
+            obj1.options.add(new Option(dic[key].name, dic[key].name));
+        }
+        for (var i = 0; i < obj1.options.length; i++) {
+            if (obj1.options[i].value == selectedValue.book_name) {
+                obj1.options[i].selected = 'selected';
+                changeUnit()
+                break;
+            }
+        }
+        {#if (selectedValue.unit != '-1') {#}
+        {#    $('#unitSelect').show()#}
+        {#}#}
+            {#if (selectedValue.lesson != '-1') {#}
+            {#    $('#lessonSelect').show()#}
+            {#}#}
+                for (var i = 0; i < obj2.options.length; i++) {
+                    if (obj2.options[i].value == selectedValue.unit) {
+                        obj2.options[i].selected = 'selected';
+                        changeLesson();
+                        break;
+                    }
+                }
+                for (var i = 0; i < obj3.options.length; i++) {
+                    if (obj3.options[i].value == selectedValue.lesson) {
+                        obj3.options[i].selected = 'selected';
+                        break;
+                    }
+                }
+
+
+                function changeUnit() {
+                    var myselect = document.getElementById("bookSelect");
+                    var selectedIndex = myselect.options.selectedIndex; // selectedIndex代表的是你所选中项的index
+                    var bookValue = myselect.options[selectedIndex].value;
+                    if (bookValue != -1) {
+                        var units = dic[bookValue]['unit'];
+                    }
+                    if (bookValue == -1) {
+                        $('#unitSelect').hide();
+                    } else {
+                        $('#unitSelect').show()
+                    }
+                    $('#lessonSelect').hide();
+                    obj2.options.length = 0;
+                    obj3.options.length = 0;
+                    obj2.options.add(new Option('请选择单元', -1));
+                    obj3.options.add(new Option('请选择课次', -1));
+                    for (var key in units) {
+                        obj2.options.add(new Option(`第${key}单元`, key))
+                    }
+                }
+
+                function changeLesson() {
+                    var bookSelect = document.getElementById("bookSelect");
+                    var selectedIndex = bookSelect.options.selectedIndex; // selectedIndex代表的是你所选中项的index
+                    var bookValue = bookSelect.options[selectedIndex].value;
+                    var unitSelect = document.getElementById("unitSelect");
+                    var selectedIndex = unitSelect.options.selectedIndex; // selectedIndex代表的是你所选中项的index
+                    var unitValue = unitSelect.options[selectedIndex].value;
+                    var lessons = dic[bookValue]['unit'][unitValue];
+                    obj3.options.length = 0;
+                    obj3.options.add(new Option('请选择课次', -1));
+                    if (unitValue == -1) {
+                        $('#lessonSelect').hide();
+                    } else {
+                        $('#lessonSelect').show()
+                    }
+                    if (unitValue != -1) {
+                        for (j = 0, len = lessons.length; j < len; j++) {
+                            obj3.options.add(new Option(`第${lessons[j]}课`, lessons[j]))
+                        }
+                    }
+                }
+    </script>
 {% endblock %}
