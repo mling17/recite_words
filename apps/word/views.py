@@ -72,4 +72,4 @@ class WordHandler(StarkHandler):
 
 
 def word_test(request):
-    return render(request, 'learn_records.html')
+    return render(request, 'learn_start.html')
