@@ -49,17 +49,7 @@ Thumbs.db
 *.mov
 *.wmv
 
-/glue_job/[awsglue,.ipynb_checkpoints]
-test*
 .gitignore
-
-# common build ignore
-/glue_job/extra_module/common/data_hub_common.egg-info/
-/glue_job/extra_module/common/build/
-/glue_job/extra_module/python_shell/data_hub_python.egg-info/
-/glue_job/extra_module/python_shell/build/
-/glue_job/extra_module/python_spark/data_hub_spark.egg-info/
-/glue_job/extra_module/python_spark/build/
 ########################## django
 # reference files
 reference/
@@ -67,11 +57,6 @@ reference/
 *.sqlite3
 # migration file
 */migrations/*
-
 */__pycache__/*
 local_settings.py
-.idea/
-*.pyc
-*.log
 *.pot
-*~*
