@@ -51,7 +51,7 @@ Thumbs.db
 
 /glue_job/[awsglue,.ipynb_checkpoints]
 test*
-#.gitignore
+.gitignore
 
 # common build ignore
 /glue_job/extra_module/common/data_hub_common.egg-info/
