@@ -1,29 +1,12 @@
+import json
 from django.shortcuts import render, HttpResponse
 from django.utils.safestring import mark_safe
 from django.db.models import Count
 from apps.word import models
 from utils.pagination import Pagination
-import json
-
-
-# Create your views here.
-def book_data(query_set):
-    data = list(query_set)
-    res = {}
-    for item in data:
-        book_name = item['book_name']
-        unit = item['unit']
-        res.update({book_name: {'name': book_name, 'unit': {}}})
-    for item in data:
-        book_name = item['book_name']
-        unit = item['unit']
-        res[book_name]['unit'].update({unit: []})
-    for item in data:
-        book_name = item['book_name']
-        unit = item['unit']
-        classes = item['classes']
-        res[book_name]['unit'][unit].append(classes)
-    return res
+from utils.tool import get_word_catalog
+from apps.stark.service.v1 import StarkHandler
+from apps.stark.service.v1 import Option
 
 
 def word_list(request):
@@ -50,7 +33,7 @@ def word_list(request):
         words_obj_list = queryset[page_object.start:page_object.end]
         # ### 搜索
         word_group = models.Words.objects.values('book_name', 'unit', 'classes').annotate(counts=Count('book_name'))
-        word_group = book_data(word_group)
+        word_group = get_word_catalog(word_group)
         # ### 搜索 end
         context = {
             'word_object_list': words_obj_list,
@@ -59,10 +42,6 @@ def word_list(request):
             'query_params': {'book_name': book, 'unit': unit, 'lesson': lesson}
         }
         return render(request, 'words.html', context)
-
-
-from apps.stark.service.v1 import StarkHandler
-from apps.stark.service.v1 import Option
 
 
 class WordHandler(StarkHandler):

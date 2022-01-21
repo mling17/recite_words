@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'apps.account',
     'apps.management',
     'apps.word',
-    'apps.stark'
+    'apps.stark',
+    'apps.testing',
 ]
 
 MIDDLEWARE = [
