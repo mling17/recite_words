@@ -4,4 +4,4 @@ from apps.stark.service.v1 import site
 from apps.word import models
 from apps.word.views import WordHandler
 
-site.register(models.Words, WordHandler)
+site.register(models.Word, WordHandler)

@@ -213,6 +213,7 @@ class StarkHandler(object):
     add_template = None
     change_template = None
     delete_template = None
+
     list_display = []
 
     def display_checkbox(self, obj=None, is_header=None, *args, **kwargs):
@@ -672,7 +673,6 @@ class StarkSite(object):
 
     @property
     def urls(self):
-        print(self.get_urls(), self.app_name, self.namespace)
         return self.get_urls(), self.app_name, self.namespace
 
 

@@ -6,24 +6,11 @@ from apps.word import models
 from utils.pagination import Pagination
 from utils.tool import get_word_catalog
 from apps.stark.service.v1 import StarkHandler
-from apps.stark.service.v1 import Option
 
 
 def word_list(request):
     if request.method == 'GET':
-        book = request.GET.get('book_name', -1)
-        unit = request.GET.get('unit', -1)
-        lesson = request.GET.get('lesson', -1)
-        if str(book) == '-1' or book is None:
-            queryset = models.Words.objects.all()
-        else:
-            if str(unit) == '-1':
-                queryset = models.Words.objects.filter(book_name=book)
-            else:
-                if str(lesson) == '-1':
-                    queryset = models.Words.objects.filter(book_name=book, unit=int(unit))
-                else:
-                    queryset = models.Words.objects.filter(book_name=book, unit=int(unit), classes=int(lesson))
+        queryset = models.Word.objects.all()
         page_object = Pagination(
             current_page=request.GET.get('page'),
             all_count=queryset.count(),
@@ -31,24 +18,20 @@ def word_list(request):
             query_params=request.GET
         )
         words_obj_list = queryset[page_object.start:page_object.end]
-        # ### 搜索
-        word_group = models.Words.objects.values('book_name', 'unit', 'classes').annotate(counts=Count('book_name'))
-        word_group = get_word_catalog(word_group)
-        # ### 搜索 end
         context = {
             'word_object_list': words_obj_list,
             'page_html': page_object.page_html(),
-            'word_group': word_group,
+            'column_names': [],
             'query_params': {'book_name': book, 'unit': unit, 'lesson': lesson}
         }
         return render(request, 'words.html', context)
 
 
-class WordHandler(StarkHandler):
-    list_display = ['unit', 'classes', 'word', 'symbol', 'cn']
-    # search_group = [Option('unit'), Option('classes')]
-    search_list = ['word', 'symbol', 'cn']
-
-
 def word_test(request):
     return render(request, 'learn_start.html')
+
+
+class WordHandler(StarkHandler):
+    list_display = ['word', 'symbol', 'cn', 'word_type', 'sentence']
+    # search_group = ['lesson']
+    search_list = ['word', 'symbol', 'cn']

@@ -23,5 +23,4 @@ urlpatterns = [
     path('manage/', include(('apps.management.urls', 'manage'), namespace='manage')),
     path('word/', include(('apps.word.urls', 'word'), namespace='word')),
     path('testing/', include(('apps.testing.urls', 'testing'), namespace='testing')),
-    re_path(r'^stark/', site.urls),
 ]
