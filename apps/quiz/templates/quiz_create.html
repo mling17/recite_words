@@ -1,0 +1,61 @@
+{% extends 'layout/basic.html' %}
+{% block content %}
+    <section class="content-header">
+        <h1>
+            新建考卷
+        </h1>
+        <ol class="breadcrumb">
+            <li>
+                <a href="{% url 'manage:index' %}"><i class="fa fa-dashboard"></i> 首页</a>
+            </li>
+            <li class="active">新建考卷</li>
+        </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content container-fluid">
+
+        <div class="box">
+            <form role="form" method="post">
+                {% csrf_token %}
+                <div class="box-body">
+                    {% for field in form %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+
+                <div class="box-footer">
+                    <button type="submit" class="btn btn-primary">确定</button>
+                </div>
+
+            </form>
+        </div>
+
+    </section>
+{% endblock %}
+{% block js %}
+    <script>
+        $('#id_book').change(function () {
+            var html = '<div class="form-group">' +
+                '<label for="id_unit">单元</label>' +
+                '<select name="book" class=" form-control" placeholder="单元" required="" id="id_unit">' +
+                '<option value="" selected="">---------</option>' +
+                '<option value="1">标准日本语单元</option>' +
+                '< /select>' +
+                '< /div>'
+            $('#id_unit').parent().remove();
+            $('#id_book').parent().after(html)
+            book_val = $('#id_book').val()
+            if (book_val == '') {
+                $('#id_unit').parent().remove();
+            }
+
+        })
+
+    </script>
+{% endblock %}

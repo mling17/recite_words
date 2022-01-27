@@ -1,0 +1,117 @@
+{% extends 'layout/basic.html' %}
+{% block content %}
+    <div class="container-fluid clearfix" style="padding: 20px 0;">
+        <div class="col-sm-6">
+            <div class="panel panel-info">
+                <div class="panel-heading clearfix">
+                    <h4 id="word" class="pull-left"></h4>
+                    <p class="pull-right">
+                        <span id="answered_num"></span>/<span id="amount"></span>
+                    </p>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group" id="answerBox">
+                        <label class="control-label" for="answer"> </label>
+                        <input type="text" class="form-control" placeholder="请输入答案" id="answer">
+                        <input type="button" class="btn btn-default" value="next" onclick=submitAnswer() id="btnCheck">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        setTimeout("$('#answer').focus()", 500)
+        var index = 0;
+        var url = "{% url 'quiz:get_quiz_question' %}";
+        var q_id = {{ q_id }};
+        var result_url = "{% url 'quiz:quiz_result' q_id %}";
+        var correct_words = [];
+        var error_words = [];
+
+        $.ajax({
+            type: "GET",
+            url: url,
+            async: false,
+            data: {'q_id': q_id},
+            success: function (data) {
+                console.log(data)
+                arr = data.word_list;
+                amount = data.amount;
+                desc = data.desc;
+                start_time = data.start_time;
+                max_total_time = data.max_total_time;
+            }
+        });
+        var data = {
+            "quiz_id": q_id,
+            'amount': amount,
+            'start_time': start_time,
+            "error_words": error_words,
+            "correct_words": correct_words
+        };
+        $('#word').text(arr[index][3]);
+        $('#answered_num').text(index + 1);
+        $('#amount').text(amount);
+
+        function sendResult() {
+            $.ajax({
+                type: "POST",
+                url: result_url,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                async: true,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    console.log(data)
+                }
+            })
+        }
+
+        function submitAnswer() {
+            setTimeout("$('#answer').focus()", 500)
+            var answer = $.trim($('#answer').val());
+            if (answer.length == 0) {
+                $('#answerBox').addClass('has-warning')
+                alert('请输入答案');
+                return
+            }
+            $('#answerBox').removeClass('has-warning')
+            if (answer == arr[index][1] || answer == arr[index][2]) {
+                console.log('right')
+                correct_words.push(arr[index][0])
+            } else {
+                console.log('wrong')
+                error_words.push([arr[index][0], answer])
+            }
+            index++;
+            $('#answered_num').text(index + 1);
+            $('#answer').val('')
+            if (index == amount) {
+                {#document.getElementById('btnCheck').value = '提交成绩';#}
+                sendResult();
+                setTimeout($(location).attr('href', result_url), 1000)
+            } else {
+                $('#word').text(arr[index][3]);
+            }
+        }
+    </script>
+    <script>
+        $("input").keydown(function (e) {
+
+            var curKey = e.which;
+            if (curKey == 13) {
+                submitAnswer();
+            }
+
+        });
+    </script>
+
+{% endblock %}

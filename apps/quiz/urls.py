@@ -13,14 +13,15 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include, re_path
-from apps.stark.service.v1 import site
+from django.urls import path
+import apps.quiz.views as views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('account/', include(('apps.account.urls', 'account'), namespace='account')),
-    path('manage/', include(('apps.management.urls', 'manage'), namespace='manage')),
-    path('word/', include(('apps.word.urls', 'word'), namespace='word')),
-    path('quiz/', include(('apps.quiz.urls', 'quiz'), namespace='quiz')),
+    # path('index/', views.index, name='index'),
+    # path('list/', views.word_list, name='word_list'),
+    path('list/', views.quiz, name='quiz_list'),
+    path('create/', views.quiz_create, name='quiz_create'),
+    path('start/<int:q_id>/', views.quiz_start, name='quiz_start'),
+    path('result/<int:q_id>/', views.quiz_result, name='quiz_result'),
+    path('get_quiz_question/', views.get_quiz_question, name='get_quiz_question')
 ]

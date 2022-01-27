@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'apps.account',
     'apps.management',
     'apps.word',
-    'apps.testing',
+    'apps.quiz',
     'apps.stark',
 ]
 
